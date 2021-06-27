@@ -6,30 +6,19 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 
 class NoteListViewController: UITableViewController {
 
-    var noteArray = [Note]()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let realm = try! Realm()
+    var noteList : Results<Note>?
     
     var selectedNote : Note?
     var selectedNoteIndex : Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        
-        
-//        let entity = NSEntityDescription.entity(forEntityName: "Note", in: context)
-//        let newNote = NSManagedObject(entity: entity!, insertInto: context)
-//        newNote.setValue("My Second Note", forKey: "title")
-//        newNote.setValue("Text Content", forKey: "text")
-        
-        saveNotes()
-        
         
         
         loadNotes()
@@ -41,10 +30,10 @@ class NoteListViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "tableToNote" {
             let destinationVC = segue.destination as! NoteViewController //downcasting
-            destinationVC.noteTitle = selectedNote?.title
-            destinationVC.noteText = selectedNote?.text
-            destinationVC.position = selectedNoteIndex
-            destinationVC.senderVC = self
+            if let indexPath = tableView.indexPathForSelectedRow{
+                destinationVC.selectedNote = noteList?[indexPath.row]
+                destinationVC.senderVC = self
+            }
         }
     }
 
@@ -52,47 +41,39 @@ class NoteListViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return noteArray.count
+        return noteList?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "noteCell",for: indexPath)
         
-        let note = noteArray[indexPath.row]
-        
-        if note.title! != ""{
-            cell.textLabel?.text = "\(note.title!)"
-        } else {
-            cell.textLabel?.text = "Untitled Note"
-        }
+        cell.textLabel?.text = noteList?[indexPath.row].title ?? "No Existing Notes"
+
 
         return cell
+        
+        
     }
     //MARK: - Data Management
     
     
-    func saveNotes(){
+    func saveNotes(note: Note){
         
         do {
-            try context.save()
-            
+            try realm.write{
+                realm.add(note)
+            }
         } catch {
-            print("Error saving context: \(error)")
+            print("Error saving note!")
         }
+        
+        tableView.reloadData()
     }
     
+    
     func loadNotes(){
-        let request = NSFetchRequest<Note>(entityName: "Note")
-                //request.predicate = NSPredicate(format: "age = %@", "12")
-                request.returnsObjectsAsFaults = false
-                do {
-                    let result = try context.fetch(request)
-                    noteArray = result
-                    
-                } catch {
-                    
-                    print("Failed")
-                }
+        noteList = realm.objects(Note.self)
+        tableView.reloadData()
     }
     //MARK: - Add New Note
     
@@ -104,20 +85,38 @@ class NoteListViewController: UITableViewController {
         let action = UIAlertAction(title: "Create", style: .default) { (action) in
             
             //what will happen once the user clicks the add button
-            let newNote = Note(context: self.context)
-            newNote.title = textField.text!
-            self.noteArray.append(newNote)
+            let newNote = Note()
+            if textField.text! != ""{
+                newNote.title = textField.text!
+            } else {
+                newNote.title = "New Note"
+            }
             
-            self.saveNotes()
+            self.saveNotes(note: newNote)
             
             self.tableView.reloadData()
+            
+            self.selectedNote = newNote
+            //self.selectedNoteIndex = self.noteList.count - 1
+            
+            self.performSegue(withIdentifier: "tableToNote", sender: self)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive) { (action) in
+            
+        
         }
         
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "New Note Title"
+            alertTextField.text = "New Note"
+            alertTextField.autocapitalizationType = .words
+            alertTextField.delegate = self
             textField = alertTextField
         }
+        alert.addAction(cancelAction)
         alert.addAction(action)
+        
         
         present(alert, animated: true, completion: nil)
     }
@@ -125,33 +124,27 @@ class NoteListViewController: UITableViewController {
     //MARK: - called by destination view controller
     
     func updateNote(position : Int, newTitle : String, newText : String){
-        noteArray[position].title = newTitle
-        noteArray[position].text = newText
+        //noteList[position].title = newTitle
+        //noteList[position].text = newText
         
-        saveNotes()
         tableView.reloadData()
     }
     
-    func deleteNote(position : Int){
-        context.delete(noteArray[position]) //remove data from permanent stores
-        noteArray.remove(at: position) //remove from item array
-        
-        saveNotes()
-        tableView.reloadData()
-        
-        self.navigationController?.popViewController(animated: true)
-        
-    }
+    
     
     //MARK: - delegate methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedNote = noteArray[indexPath.row]
-        selectedNoteIndex = indexPath.row
         
         performSegue(withIdentifier: "tableToNote", sender: self)
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    
 }
+
+extension NoteListViewController : UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textField.selectedTextRange = textField.textRange(from: textField.beginningOfDocument, to: textField.endOfDocument)
+    }
+}
+

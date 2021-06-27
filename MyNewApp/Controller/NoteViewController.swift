@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 
 class NoteViewController: UIViewController {
@@ -16,59 +16,41 @@ class NoteViewController: UIViewController {
     @IBOutlet weak var navigationBar: UINavigationItem!
     @IBOutlet weak var noteTextView: UITextView!
     
+    var selectedNote : Note? {
+        didSet{
+            //loadNote()
+        }
+    }
+    let realm = try! Realm()
     var isDeleted : Bool = false
-    var noteTitle : String?
-    var noteText : String?
     var position : Int?
     var senderVC : NoteListViewController?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("load note")
         
         noteTextView.delegate = self
         
         
-        noteTextView.text = noteText
-        navigationBar.title = noteTitle
+        noteTextView.text = selectedNote?.text
+        navigationBar.title = selectedNote?.title
         
         
-    }
-    
-    //MARK: - edit title
-    @IBAction func editButtonPressed(_ sender: UIBarButtonItem) {
-        var textField = UITextField()
-        let alert = UIAlertController(title: "Edit Title", message: "", preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: "Confirm", style: .default) { (action) in
-            self.navigationBar.title = textField.text!
-            self.saveData()
-        }
-        alert.addTextField { (alertTextField) in
-            textField = alertTextField
-        }
-        alert.addAction(action)
-        
-        present(alert, animated: true, completion: nil)
-        
-    }
-
-    
-    @IBAction func trashButtonPressed(_ sender: UIBarButtonItem) {
-        senderVC?.deleteNote(position: position!)
-        isDeleted = true
-        
-        
-        self.dismiss(animated: true, completion: nil)
     }
     
     func saveData(){
-        if !isDeleted{
-            senderVC?.updateNote(position: position!, newTitle: navigationBar.title!, newText: noteTextView.text!)
-        }
-
     }
     override func viewWillDisappear(_ animated: Bool) {
-        saveData()
+        //saveData()
+    }
+    //MARK: - segue management
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "noteToEdit" {
+            let destinationVC = segue.destination as! EditViewController //downcasting
+            destinationVC.senderVC = self
+            destinationVC.selectedNote = self.selectedNote
+        }
     }
 }
 
@@ -76,7 +58,17 @@ class NoteViewController: UIViewController {
 
 extension NoteViewController : UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
-        saveData()
+        print("End editing")
+        
+        if let newText = noteTextView.text{
+            do {
+                try realm.write{
+                    selectedNote?.text = newText
+                }
+            }catch {
+                print("Error saving done status: \(error)")
+            }
+        }
     }
     
 }

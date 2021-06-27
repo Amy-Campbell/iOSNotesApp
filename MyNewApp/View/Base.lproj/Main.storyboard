@@ -73,18 +73,11 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Xyo-ZO-7BP">
-                        <rightBarButtonItems>
-                            <barButtonItem systemItem="trash" id="xgQ-Tq-PQ3">
-                                <connections>
-                                    <action selector="trashButtonPressed:" destination="MVZ-z4-pQ7" id="rQk-ek-Hnc"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem systemItem="edit" id="V42-lU-MNn">
-                                <connections>
-                                    <action selector="editButtonPressed:" destination="MVZ-z4-pQ7" id="N5X-lS-Qdt"/>
-                                </connections>
-                            </barButtonItem>
-                        </rightBarButtonItems>
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="V42-lU-MNn">
+                            <connections>
+                                <segue destination="MFO-dk-eMm" kind="show" identifier="noteToEdit" id="Ykh-vX-ELY"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="navigationBar" destination="Xyo-ZO-7BP" id="URi-LA-Ej1"/>
@@ -94,6 +87,85 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5pE-Eg-P2A" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2598.5507246376815" y="91.741071428571431"/>
+        </scene>
+        <!--Edit View Controller-->
+        <scene sceneID="GTG-Nf-bTf">
+            <objects>
+                <viewController id="MFO-dk-eMm" customClass="EditViewController" customModule="MyNewApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="lGJ-0O-H4d">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="top" axis="vertical" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="o3e-Pb-yNK" userLabel="AllSettingsVertical">
+                                <rect key="frame" x="10" y="98" width="394" height="122"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="O7U-JJ-P0d" userLabel="TitleCell">
+                                        <rect key="frame" x="0.0" y="0.0" width="394" height="34"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d2n-et-jd5" userLabel="Title">
+                                                <rect key="frame" x="0.0" y="0.0" width="33" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="New Title" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="mdu-oP-pct" userLabel="NoteTitle">
+                                                <rect key="frame" x="43" y="0.0" width="351" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="yes" spellCheckingType="yes" returnKeyType="done" enablesReturnKeyAutomatically="YES" smartDashesType="yes"/>
+                                            </textField>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="waM-gW-zOq" userLabel="SettingsCell">
+                                        <rect key="frame" x="0.0" y="44" width="394" height="34"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Setting" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6lY-Yr-4qR" userLabel="Setting">
+                                                <rect key="frame" x="0.0" y="0.0" width="335" height="34"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="loz-cy-NQM">
+                                                <rect key="frame" x="345" y="0.0" width="51" height="34"/>
+                                            </switch>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="q6z-Os-m7U" userLabel="SettingsCell">
+                                        <rect key="frame" x="0.0" y="88" width="394" height="34"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8yt-Er-1nA">
+                                                <rect key="frame" x="0.0" y="0.0" width="394" height="34"/>
+                                                <state key="normal" title=" Delete Note">
+                                                    <color key="titleColor" systemColor="systemRedColor"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="deletePressed:" destination="MFO-dk-eMm" eventType="touchUpInside" id="wqs-OW-SwV"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="waM-gW-zOq" firstAttribute="height" secondItem="O7U-JJ-P0d" secondAttribute="height" id="3sq-cz-Wgn"/>
+                                    <constraint firstItem="q6z-Os-m7U" firstAttribute="height" secondItem="O7U-JJ-P0d" secondAttribute="height" id="OVB-I6-mAU"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="EQp-He-uMI"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="o3e-Pb-yNK" firstAttribute="leading" secondItem="EQp-He-uMI" secondAttribute="leading" constant="10" id="9Gf-82-0sL"/>
+                            <constraint firstItem="EQp-He-uMI" firstAttribute="trailing" secondItem="o3e-Pb-yNK" secondAttribute="trailing" constant="10" id="EEK-GQ-r7a"/>
+                            <constraint firstItem="o3e-Pb-yNK" firstAttribute="top" secondItem="EQp-He-uMI" secondAttribute="top" constant="10" id="uDN-Jr-ZfS"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="yGY-hO-wOk"/>
+                    <connections>
+                        <outlet property="titleTextField" destination="mdu-oP-pct" id="Cw4-g5-tnu"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hfF-Hs-T3R" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3413" y="100"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="SLk-mR-B4D">
@@ -120,6 +192,9 @@
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
